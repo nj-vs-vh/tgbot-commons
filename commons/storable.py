@@ -1,8 +1,6 @@
-from dataclasses import asdict
 import json
-
+from dataclasses import asdict
 from typing import Type, TypeVar
-
 
 _StorableType = TypeVar("_StorableType")
 

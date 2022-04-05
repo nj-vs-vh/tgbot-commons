@@ -1,6 +1,6 @@
-from telebot.types import Message
 import logging
 
+from telebot.types import Message
 
 logger = logging.getLogger(__name__)
 

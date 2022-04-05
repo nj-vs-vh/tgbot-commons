@@ -1,11 +1,14 @@
+import logging
+
+from redis import Redis
 from telebot import TeleBot
 from telebot.types import Message
-from redis import Redis
-from commons.banned_users_store import BannedUsersStore
 
-from commons.category_store import CategoryStore, Category
+from commons.banned_users_store import BannedUsersStore
+from commons.category_store import Category, CategoryStore
 from commons.feedback import AntiSpamConfig, add_feedback_handlers
 
+logging.basicConfig(level=logging.INFO)
 
 bot = TeleBot("TOKEN")
 admin_chat_id = "-100XXXXXXXXXX"

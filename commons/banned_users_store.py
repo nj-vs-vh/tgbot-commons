@@ -1,5 +1,6 @@
-from redis import Redis
 from typing import Set
+
+from redis import Redis
 
 
 class BannedUsersStore:

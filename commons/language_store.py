@@ -1,20 +1,14 @@
 from __future__ import annotations
+
 from asyncio.log import logger
-
 from enum import Enum
-from redis import Redis
+from typing import Callable, Dict, List, Optional
 
+from redis import Redis
 from telebot import TeleBot
 from telebot.callback_data import CallbackData
-from telebot.types import (
-    User,
-    CallbackQuery,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-)
-
-from typing import List, Callable, Optional, Dict
+from telebot.types import (CallbackQuery, InlineKeyboardButton,
+                           InlineKeyboardMarkup, Message, User)
 
 from commons.callback_data_filter import setup_callback_data_filter
 

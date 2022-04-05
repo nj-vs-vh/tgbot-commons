@@ -1,6 +1,6 @@
-from telebot.custom_filters import AdvancedCustomFilter
+from telebot import TeleBot, types
 from telebot.callback_data import CallbackData
-from telebot import types, TeleBot
+from telebot.custom_filters import AdvancedCustomFilter
 
 
 class CallbackDataFilter(AdvancedCustomFilter):

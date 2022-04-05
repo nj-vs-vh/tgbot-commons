@@ -1,9 +1,8 @@
+from redis import Redis
 from telebot import TeleBot
 from telebot.types import Message
-from redis import Redis
 
-from commons.category_store import CategoryStore, Category
-
+from commons.category_store import Category, CategoryStore
 
 bot = TeleBot("TOKEN")
 bot_prefix = "unique-prefix"

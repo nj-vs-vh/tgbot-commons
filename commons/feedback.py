@@ -1,22 +1,23 @@
 from __future__ import annotations
 
-from telebot import TeleBot, util
-from redis import Redis
-from dataclasses import dataclass
-from enum import Enum
 import logging
+from dataclasses import dataclass
 from datetime import timedelta
+from enum import Enum
 from itertools import chain
+from typing import Callable, Dict, List, Optional
 
-from typing import Callable, Optional, List, Dict, Optional
+from redis import Redis
+from telebot import TeleBot, util
 from telebot.types import Message, User
 
-from commons.is_in_chat import is_in_chat
 from commons.banned_users_store import BannedUsersStore
-from commons.storable import Storable
 from commons.category_store import CategoryStore
+from commons.is_in_chat import is_in_chat
 from commons.language_store import Language, LanguageStore
-from commons.times import LARGE_EXPIRATION_TIME, GROUPED_MESSAGES_MAX_SEPARATION_TIME
+from commons.storable import Storable
+from commons.times import (GROUPED_MESSAGES_MAX_SEPARATION_TIME,
+                           LARGE_EXPIRATION_TIME)
 
 
 @dataclass

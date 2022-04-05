@@ -1,19 +1,15 @@
 from dataclasses import dataclass
 from datetime import timedelta
-from telebot.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    CallbackQuery,
-)
-from telebot.callback_data import CallbackData
-from telebot import TeleBot
+from typing import Dict, List, Optional, Union
+
 from redis import Redis
+from telebot import TeleBot
+from telebot.callback_data import CallbackData
+from telebot.types import (CallbackQuery, InlineKeyboardButton,
+                           InlineKeyboardMarkup, User)
 
-from telebot.types import User
-from typing import List, Optional, Union, Dict
-
-from commons.language_store import Language, LanguageStore
 from commons.callback_data_filter import setup_callback_data_filter
+from commons.language_store import Language, LanguageStore
 
 
 @dataclass
