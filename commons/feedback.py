@@ -32,21 +32,15 @@ class ServiceMessages:
     # messages to user:
     forwarded_to_admin_ok: Optional[str] = "Переслано!"
     select_category: str = "Пожалуйста, сначала выберите/обновите тему сообщения, и затем пришлите его заново"
-    throttling_template: str = (
-        "⚠️ Пожалуйста, не присылайте больше {} сообщений в течение {} мин!"
-    )
+    throttling_template: str = "⚠️ Пожалуйста, не присылайте больше {} сообщений в течение {} мин!"
     # messages in admin chat
     copied_to_user_ok: str = "Скопировано!"
     message_log_unavailable: str = "История сообщений недоступна"
     somethings_wrong_template: str = "Что-то пошло не так: {}"
-    unsupported_type_in_admin_reply_pre: str = (
-        "Бот поддерживает только следующие типы вложений в ответ: "
-    )
+    unsupported_type_in_admin_reply_pre: str = "Бот поддерживает только следующие типы вложений в ответ: "
 
     def throttling(self, anti_spam: AntiSpamConfig) -> str:
-        return self.throttling_template.format(
-            anti_spam.throttle_after_messages, anti_spam.throttle_duration_min
-        )
+        return self.throttling_template.format(anti_spam.throttle_after_messages, anti_spam.throttle_duration_min)
 
     def somethings_wrong(self, e: Exception) -> str:
         return self.somethings_wrong_template.format(e)
@@ -128,16 +122,10 @@ def add_feedback_handlers(
         save_to_message_log(origin_chat_id, forwarded_message.id)
 
     def get_messages_related_to_user(user_id: int) -> List[int]:
-        return [
-            int(id_str)
-            for id_str in redis.lrange(_messages_related_to_user_key(user_id), 0, -1)
-        ]
+        return [int(id_str) for id_str in redis.lrange(_messages_related_to_user_key(user_id), 0, -1)]
 
     def get_message_log(origin_chat_id: int) -> List[int]:
-        return [
-            int(msgid)
-            for msgid in redis.lrange(_message_log_with_user_key(origin_chat_id), 0, -1)
-        ]
+        return [int(msgid) for msgid in redis.lrange(_message_log_with_user_key(origin_chat_id), 0, -1)]
 
     def get_origin_chat(forwarded_msg_id: int) -> Optional[int]:
         try:
@@ -158,10 +146,7 @@ def add_feedback_handlers(
             return AcceptMessage.NOW
         violations_key = _rate_limit_violations_key(user_id)
         violations = redis.get(violations_key)
-        if (
-            violations is not None
-            and int(violations) >= anti_spam.soft_ban_after_throttle_violations
-        ):
+        if violations is not None and int(violations) >= anti_spam.soft_ban_after_throttle_violations:
             return AcceptMessage.LATER
 
         counter_key = _message_counter_key(user_id)
@@ -171,9 +156,7 @@ def add_feedback_handlers(
             return AcceptMessage.NOW
         else:
             redis.incr(violations_key)
-            redis.expire(
-                violations_key, timedelta(days=anti_spam.soft_ban_duration_days)
-            )
+            redis.expire(violations_key, timedelta(days=anti_spam.soft_ban_duration_days))
             return AcceptMessage.SOON
 
     # hashtag messages - "titles" for forwarded messages for easier admin chat navigation
@@ -181,9 +164,7 @@ def add_feedback_handlers(
     def _hashtag_message_for_msg(forwarded_msg_id: int) -> str:
         return f"{bot_prefix}-hashtag-msg-for-fwd-{forwarded_msg_id}"
 
-    def save_hashtag_msg_data_for_message(
-        forwarded_msg_id: int, hashtag_message_data: HashtagMessageData
-    ):
+    def save_hashtag_msg_data_for_message(forwarded_msg_id: int, hashtag_message_data: HashtagMessageData):
         redis.set(
             _hashtag_message_for_msg(forwarded_msg_id),
             hashtag_message_data.to_store(),
@@ -194,18 +175,14 @@ def add_feedback_handlers(
         forwarded_msg_id: int,
     ) -> Optional[HashtagMessageData]:
         try:
-            return HashtagMessageData.from_store(
-                redis.get(_hashtag_message_for_msg(forwarded_msg_id))
-            )
+            return HashtagMessageData.from_store(redis.get(_hashtag_message_for_msg(forwarded_msg_id)))
         except Exception:
             return None
 
     def _recent_hashtag_for_user_key(user_id: int) -> str:
         return f"{bot_prefix}-recent-hashtag-for-{user_id}"
 
-    def save_recent_hashtag_message_for_user(
-        user_id: int, hashtag_message_data: HashtagMessageData
-    ):
+    def save_recent_hashtag_message_for_user(user_id: int, hashtag_message_data: HashtagMessageData):
         redis.set(
             _recent_hashtag_for_user_key(user_id),
             hashtag_message_data.to_store(),
@@ -216,9 +193,7 @@ def add_feedback_handlers(
         user_id: int,
     ) -> Optional[HashtagMessageData]:
         try:
-            return HashtagMessageData.from_store(
-                redis.get(_recent_hashtag_for_user_key(user_id))
-            )
+            return HashtagMessageData.from_store(redis.get(_recent_hashtag_for_user_key(user_id)))
         except Exception:
             return None
 
@@ -262,12 +237,9 @@ def add_feedback_handlers(
                 else:
                     category_hashtag = "#" + category.name
 
-            recent_hashtag_msg_data = get_recent_hashatag_message_for_user(
-                message.from_user.id
-            )
+            recent_hashtag_msg_data = get_recent_hashatag_message_for_user(message.from_user.id)
             if recent_hashtag_msg_data is None or (  # send a new hashtag message?
-                category_hashtag is not None
-                and category_hashtag not in recent_hashtag_msg_data.hashtags
+                category_hashtag is not None and category_hashtag not in recent_hashtag_msg_data.hashtags
             ):
                 hashtags = [UNANSWERED_HASHTAG]
                 if category_hashtag is not None:
@@ -276,12 +248,8 @@ def add_feedback_handlers(
                 # we'll delete hashtag message if the user is banned
                 save_message_related_to_user(message.from_user.id, hashtag_msg.id)
                 recent_hashtag_msg_data = HashtagMessageData(hashtag_msg.id, hashtags)
-                save_recent_hashtag_message_for_user(
-                    message.from_user.id, recent_hashtag_msg_data
-                )
-        forwarded_msg = bot.forward_message(
-            chat_id=admin_chat_id, from_chat_id=message.chat.id, message_id=message.id
-        )
+                save_recent_hashtag_message_for_user(message.from_user.id, recent_hashtag_msg_data)
+        forwarded_msg = bot.forward_message(chat_id=admin_chat_id, from_chat_id=message.chat.id, message_id=message.id)
         save_forwarded_message(message, forwarded_msg)
         if hashtag_messages_in_admin_chat:
             # here recent_hashtag_msg_data may be just sent or already existing
@@ -299,23 +267,16 @@ def add_feedback_handlers(
         elif message.content_type == "sticker":
             bot.send_sticker(chat_id, sticker=message.sticker.file_id)
         elif message.content_type == "document":
-            bot.send_document(
-                chat_id, document=message.document.file_id, caption=message.html_caption
-            )
+            bot.send_document(chat_id, document=message.document.file_id, caption=message.html_caption)
         elif message.content_type == "photo":
-            bot.send_photo(
-                chat_id, photo=message.photo[0].file_id, caption=message.html_caption
-            )
+            bot.send_photo(chat_id, photo=message.photo[0].file_id, caption=message.html_caption)
 
     def admin_chat_message_filter(message: Message) -> bool:
         return is_in_admin_chat(message) and message.reply_to_message is not None
 
     def remove_unanswered_hashtag(message_id: int):
         hashtag_message_data = get_hashtag_msg_data_for_message(message_id)
-        if (
-            hashtag_message_data is not None
-            and UNANSWERED_HASHTAG in hashtag_message_data.hashtags
-        ):
+        if hashtag_message_data is not None and UNANSWERED_HASHTAG in hashtag_message_data.hashtags:
             hashtag_message_data.hashtags.remove(UNANSWERED_HASHTAG)
             try:
                 if hashtag_message_data.hashtags:
@@ -336,9 +297,7 @@ def add_feedback_handlers(
                 pass
             save_hashtag_msg_data_for_message(message_id, hashtag_message_data)
 
-    @bot.message_handler(
-        func=admin_chat_message_filter, content_types=util.content_type_media
-    )
+    @bot.message_handler(func=admin_chat_message_filter, content_types=util.content_type_media)
     def admin_to_bot(message: Message):
         try:
             forwarded_msg = message.reply_to_message
@@ -348,16 +307,12 @@ def add_feedback_handlers(
             if message.content_type not in SUPPORTED_CONTENT_TYPES:
                 bot.reply_to(
                     message,
-                    service_messages.unsupported_type_in_admin_reply(
-                        SUPPORTED_CONTENT_TYPES
-                    ),
+                    service_messages.unsupported_type_in_admin_reply(SUPPORTED_CONTENT_TYPES),
                 )
                 return
             if message.text == "/ban":
                 banned_users_store.ban_user(origin_chat_id)
-                for message_id in chain(
-                    get_messages_related_to_user(origin_chat_id), [message.id]
-                ):
+                for message_id in chain(get_messages_related_to_user(origin_chat_id), [message.id]):
                     try:
                         bot.delete_message(chat_id=admin_chat_id, message_id=message_id)
                     except Exception:
@@ -367,9 +322,7 @@ def add_feedback_handlers(
                 if not log_message_ids:
                     bot.reply_to(message, service_messages.message_log_unavailable)
                     return
-                send_log_to = (
-                    admin_chat_id if send_log_to_admin_chat else message.from_user.id
-                )
+                send_log_to = admin_chat_id if send_log_to_admin_chat else message.from_user.id
                 for message_id in log_message_ids:
                     try:
                         log_msg = bot.forward_message(

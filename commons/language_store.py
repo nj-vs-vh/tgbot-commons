@@ -50,9 +50,7 @@ class LanguageStore:
 
     def get_user_lang(self, user: User) -> Language:
         try:
-            stored_lang_code = self.redis.get(self._user_language_key(user.id)).decode(
-                "utf-8"
-            )
+            stored_lang_code = self.redis.get(self._user_language_key(user.id)).decode("utf-8")
             return Language(stored_lang_code)
         except Exception as e:
             logger.debug(f"Error retrieving saved lang for user: {e}")
@@ -74,18 +72,14 @@ class LanguageStore:
     ):
         setup_callback_data_filter(bot)
 
-        @bot.callback_query_handler(
-            func=None, callback_data=self.language_callback_data
-        )
+        @bot.callback_query_handler(func=None, callback_data=self.language_callback_data)
         def language_selected(call: CallbackQuery):
             data = self.language_callback_data.parse(call.data)
             user = call.from_user
             language = Language(data["code"])
             self.save_user_lang(user, language)
             try:
-                bot.edit_message_reply_markup(
-                    user.id, call.message.id, reply_markup=self.markup(user)
-                )
+                bot.edit_message_reply_markup(user.id, call.message.id, reply_markup=self.markup(user))
                 bot.answer_callback_query(call)
             except Exception:
                 # exceptions are raised when user clicks on the same button and markup is not changed

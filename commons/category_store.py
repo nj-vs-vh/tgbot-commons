@@ -40,9 +40,7 @@ class CategoryStore:
         self.categories_by_id = {c.id_: c for c in categories}
         self.select_category_callback_data = CallbackData("cat_id", prefix="category")
         self.language_store = language_store
-        if (
-            language_store is not None
-        ):  # if languages are used, assert that for every category every lang is specified
+        if language_store is not None:  # if languages are used, assert that for every category every lang is specified
             for cat in categories:
                 for lang in language_store.languages:
                     assert isinstance(cat.button_caption, dict)
@@ -68,18 +66,14 @@ class CategoryStore:
     def setup(self, bot: TeleBot):
         setup_callback_data_filter(bot)
 
-        @bot.callback_query_handler(
-            func=None, callback_data=self.select_category_callback_data
-        )
+        @bot.callback_query_handler(func=None, callback_data=self.select_category_callback_data)
         def category_select_btn_pressed(call: CallbackQuery):
             data = self.select_category_callback_data.parse(call.data)
             user_id = call.from_user.id
             cat_id = int(data["cat_id"])
             self.save_category_for_user(user_id, cat_id)
             try:
-                bot.edit_message_reply_markup(
-                    user_id, call.message.id, reply_markup=self.markup(call.from_user)
-                )
+                bot.edit_message_reply_markup(user_id, call.message.id, reply_markup=self.markup(call.from_user))
                 bot.answer_callback_query(call)
             except Exception:
                 # exceptions are raised when user clicks on the same button and markup is not changed
@@ -107,9 +101,7 @@ class CategoryStore:
                 [
                     InlineKeyboardButton(
                         text=get_caption(category),
-                        callback_data=self.select_category_callback_data.new(
-                            cat_id=category.id_
-                        ),
+                        callback_data=self.select_category_callback_data.new(cat_id=category.id_),
                     )
                 ]
                 for category in self.categories
