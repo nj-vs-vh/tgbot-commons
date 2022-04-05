@@ -21,12 +21,16 @@ category_store = CategoryStore(
 category_store.setup(bot)  # adds necessary handlers to bot
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=["start"])
 def start(message: Message):
-    bot.send_message(message.from_user.id, "Please choose your category:", reply_markup=category_store.markup(message.from_user))
+    bot.send_message(
+        message.from_user.id,
+        "Please choose your category:",
+        reply_markup=category_store.markup(message.from_user),
+    )
 
 
-@bot.message_handler(commands=['mycategory'])
+@bot.message_handler(commands=["mycategory"])
 def mycat(message: Message):
     category = category_store.get_user_category(message.from_user.id)
     if category is None:

@@ -4,7 +4,7 @@ from telebot import types, TeleBot
 
 
 class CallbackDataFilter(AdvancedCustomFilter):
-    key = 'callback_data'
+    key = "callback_data"
 
     def check(self, call: types.CallbackQuery, callback_data: CallbackData):
         try:
