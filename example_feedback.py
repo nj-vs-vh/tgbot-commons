@@ -11,6 +11,9 @@ from commons.feedback import AntiSpamConfig, add_feedback_handlers
 logging.basicConfig(level=logging.INFO)
 
 bot = TeleBot("TOKEN")
+
+# attention! admin_chat_id should be int
+# here it's a string just to show what these ids normally look like
 admin_chat_id = "-100XXXXXXXXXX"
 
 bot_prefix = "another-unique-prefix"
